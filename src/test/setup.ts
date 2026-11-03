@@ -6,3 +6,6 @@ afterEach(() => {
   cleanup();
   localStorage.clear();
 });
+
+// jsdom n'implémente pas le défilement.
+window.scrollTo = () => {};

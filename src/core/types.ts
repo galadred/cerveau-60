@@ -32,6 +32,8 @@ export interface GameResult {
   playedAt: string;
   /** Clé AAAA-MM-JJ pour le défi quotidien. */
   dailyKey?: string;
+  /** Preuve rejouable (graine + choix horodatés) pour la vérification serveur future. */
+  proof?: { v: number; seed: string; a: [number, number][] };
 }
 
 export interface ModeStats {

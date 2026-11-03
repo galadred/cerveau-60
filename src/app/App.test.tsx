@@ -89,4 +89,30 @@ describe('Application', () => {
     expect(JSON.parse(localStorage.getItem('cerveau60:results')!)).toEqual([]);
     expect(JSON.parse(localStorage.getItem('cerveau60:profile')!).xp).toBe(0);
   });
+
+  it('lance une manche Logique, répond, puis abandonne sans rien enregistrer', async () => {
+    await onboard();
+    fireEvent.click(screen.getByRole('button', { name: /^jouer$/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /logique/i }));
+    fireEvent.click((await screen.findAllByRole('button', { name: /lancer/i }))[0]);
+    // compte à rebours 3-2-1 puis première énigme
+    const choices = await screen.findAllByRole('button', { name: /^réponse \d/i }, { timeout: 4000 });
+    expect(choices).toHaveLength(4);
+    expect(screen.getByRole('timer')).toBeInTheDocument();
+    fireEvent.click(choices[0]);
+    // verrou pendant le retour visuel : les propositions sont désactivées
+    expect(screen.getAllByRole('button', { name: /^réponse \d/i })[1]).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /abandonner la manche/i }));
+    await act(async () => fireEvent.click(await screen.findByRole('button', { name: /^abandonner$/i })));
+    expect(await screen.findByRole('radiogroup', { name: /difficulté/i })).toBeInTheDocument();
+    expect(localStorage.getItem('cerveau60:results')).toBeNull();
+  });
+
+  it('les modes non encore développés n’ont pas de bouton de lancement', async () => {
+    await onboard();
+    fireEvent.click(screen.getByRole('button', { name: /^jouer$/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /observation/i }));
+    expect(await screen.findByText(/étape 3/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /lancer/i })).toBeNull();
+  });
 });

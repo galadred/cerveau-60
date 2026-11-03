@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { ModeId } from '@/core/types';
+import type { DifficultyId, ModeId } from '@/core/types';
+import type { RoundReport } from '@/screens/results/report';
 
 /** Écrans de l'application et leurs paramètres. */
 export type Route =
@@ -8,7 +9,9 @@ export type Route =
   | { name: 'briefing'; mode: ModeId }
   | { name: 'stats' }
   | { name: 'leaderboard'; mode?: ModeId }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'play'; mode: ModeId; difficulty: DifficultyId; run: string }
+  | { name: 'results'; report: RoundReport };
 
 interface NavValue {
   route: Route;
@@ -18,6 +21,8 @@ interface NavValue {
   navigate(route: Route): void;
   back(): void;
   home(): void;
+  /** Remplace l'écran courant (ex. manche → résultats). */
+  replace(route: Route): void;
 }
 
 const Ctx = createContext<NavValue | null>(null);
@@ -34,14 +39,18 @@ export function NavigationProvider({ children, initial = { name: 'menu' } }: { c
     setDirection(-1);
     setStack((s) => (s.length > 1 ? s.slice(0, -1) : s));
   }, []);
+  const replace = useCallback((r: Route) => {
+    setDirection(1);
+    setStack((s) => [...s.slice(0, -1), r]);
+  }, []);
   const home = useCallback(() => {
     setDirection(-1);
     setStack((s) => [s[0]]);
   }, []);
 
   const value = useMemo<NavValue>(
-    () => ({ route: stack[stack.length - 1], direction, canGoBack: stack.length > 1, navigate, back, home }),
-    [stack, direction, navigate, back, home],
+    () => ({ route: stack[stack.length - 1], direction, canGoBack: stack.length > 1, navigate, back, home, replace }),
+    [stack, direction, navigate, back, home, replace],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
@@ -53,5 +62,6 @@ export function useNavigation(): NavValue {
 }
 
 export function routeKey(r: Route): string {
+  if (r.name === 'results') return `results:${r.report.result.id}`;
   return Object.values(r).join(':');
 }

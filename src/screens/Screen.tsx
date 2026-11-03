@@ -9,7 +9,8 @@ export function Screen({ children, direction, className = '' }: { children: Reac
       custom={direction}
       variants={{
         enter: (d: number) => ({ opacity: 0, x: d * 48, filter: 'blur(6px)' }),
-        center: { opacity: 1, x: 0, filter: 'blur(0px)' },
+        // filter: 'none' en fin d'animation : un filtre résiduel casserait les éléments `position: fixed`.
+        center: { opacity: 1, x: 0, filter: 'blur(0px)', transitionEnd: { filter: 'none', transform: 'none' } },
         exit: (d: number) => ({ opacity: 0, x: d * -48, filter: 'blur(6px)' }),
       }}
       initial="enter"

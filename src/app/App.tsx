@@ -9,6 +9,8 @@ import { ModesScreen } from '@/screens/ModesScreen';
 import { Onboarding } from '@/screens/Onboarding';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { StatsScreen } from '@/screens/StatsScreen';
+import { GameScreen } from '@/screens/game/GameScreen';
+import { ResultsScreen } from '@/screens/results/ResultsScreen';
 import { Logo } from '@/ui/Logo';
 import { NavigationProvider, routeKey, useNavigation, type Route } from './navigation';
 
@@ -23,6 +25,8 @@ function CurrentScreen() {
       case 'stats': return <StatsScreen key={key} direction={direction} />;
       case 'leaderboard': return <LeaderboardScreen key={key} direction={direction} initialMode={r.mode} />;
       case 'settings': return <SettingsScreen key={key} direction={direction} />;
+      case 'play': return <GameScreen key={key} mode={r.mode} difficulty={r.difficulty} />;
+      case 'results': return <ResultsScreen key={key} direction={direction} report={r.report} />;
     }
   };
   useEffect(() => {

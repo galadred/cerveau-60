@@ -23,7 +23,20 @@ src/
 │   ├── progression.ts    XP → niveaux et titres
 │   ├── stats.ts          Statistiques calculées depuis l'historique
 │   ├── daily.ts          Clé du jour + aléatoire déterministe (défi identique pour tous)
-│   └── daily-status.ts
+│   ├── daily-status.ts
+│   ├── random.ts         Rng reproductible + dérivation de graines
+│   ├── puzzles/          Générateurs du mode Logique
+│   │   ├── sequence.ts   Suites (11 familles de règles, 5 intensités)
+│   │   ├── arithmetic.ts Calculs (priorités, parenthèses, pourcentages, opérande manquant)
+│   │   ├── deduction.ts  Symboles + recherche exhaustive d'unicité
+│   │   ├── solvers.ts    9 solveurs de suites : détectent les réponses concurrentes
+│   │   ├── expr.ts       Évaluateur indépendant de ce qui est affiché
+│   │   ├── validate.ts   Contrôle final de chaque énigme
+│   │   └── logic.ts      Orchestration déterministe (graine, rang, intensité)
+│   └── engine/
+│       ├── session.ts    Moteur de manche (horloge, réponses, score, pénalités)
+│       ├── intensity.ts  Difficulté progressive pendant la manche
+│       └── verify.ts     Rejeu intégral d'une manche à partir de sa preuve
 ├── services/             Accès aux données, derrière des interfaces asynchrones
 │   ├── storage/          KeyValueStore + LocalStorageStore (résistant aux erreurs)
 │   ├── repositories/     Contrats Profile/Result/Leaderboard + implémentation locale
@@ -42,13 +55,32 @@ Il suffira d'écrire `createSupabaseRepositories()` qui les implémente et de la
 depuis `services/index.ts` quand `VITE_SUPABASE_URL` est défini. L'id du profil local
 (UUID) servira à rattacher l'historique au compte lors de la première connexion.
 
+## Garanties du mode Logique
+
+- **Solution unique et correcte** : chaque énigme est revalidée à partir de ce qui est *affiché*.
+  - Suites : 9 solveurs (différences d'ordre 1 à 3, raison, récurrence affine, Fibonacci ± c,
+    récurrence d'ordre 2, alternance d'opérations, suites entrelacées). Une suite n'est proposée que si
+    toutes les règles qui s'ajustent donnent la même réponse. Exemple rejeté : 1, 3, 6, 11, 19 (31 ou 32).
+  - Calculs : réévalués par un analyseur indépendant ; exactement une proposition satisfait l'égalité.
+  - Déductions : recherche exhaustive sur tout le domaine annoncé au joueur (entiers de 1 à 20).
+- **Difficulté progressive** : 5 intensités ; la manche démarre au rang de la difficulté et monte d'un
+  cran toutes les 4 bonnes réponses (+2 au maximum).
+- **Chronomètre** : horloge monotone (`performance.now`) à échéance absolue — changer l'heure du système,
+  mettre l'onglet en arrière-plan ou ralentir l'affichage ne change rien. Aucune pause ; le retour visuel
+  consomme le temps ; abandonner n'enregistre rien.
+- **Score cohérent** : calculé uniquement par le moteur. Avant chaque sauvegarde, la manche est rejouée
+  à partir de sa preuve (graine + choix horodatés) ; toute incohérence bloque l'enregistrement.
+- **Limite honnête** : un jeu 100 % navigateur ne peut pas empêcher un joueur déterminé de modifier
+  le code via les outils de développement. La preuve stockée avec chaque résultat permettra au serveur
+  (Supabase) de rejouer et valider les scores avant de les publier au classement en ligne.
+
 ## Feuille de route
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Fondations, design system, stockage, profil, menu, navigation animée, modes, briefing & difficultés, stats, classement local, réglages | ✅ |
-| 2 | Moteur de manche (60 s, pénalités, série, score, écran de résultats) + mode **Logique** (générateurs procéduraux) | ⏳ |
-| 3 | Mode **Observation** (différences, intrus, détails cachés) | |
+| 2 | Moteur de manche (60 s, pénalités, série, score, écran de résultats) + mode **Logique** (générateurs procéduraux) | ✅ |
+| 3 | Mode **Observation** (différences, intrus, détails cachés) | ⏳ |
 | 4 | Mode **Énigmes** (banque d'énigmes, vérification tolérante des réponses) | |
 | 5 | **Défi quotidien** (énigme déterministe du jour, une tentative) | |
 | 6 | Finitions : sons, succès, PWA hors ligne, puis Supabase | |

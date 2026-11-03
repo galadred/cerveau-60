@@ -18,7 +18,7 @@ export function StatsScreen({ direction }: { direction: 1 | -1 }) {
   const kpis = [
     { label: 'Parties jouées', value: stats.games.toLocaleString('fr-FR') },
     { label: 'Meilleur score', value: stats.bestScore.toLocaleString('fr-FR'), hot: true },
-    { label: 'Précision', value: stats.totalAttempted ? `${Math.round(stats.accuracy * 100)} %` : '—' },
+    { label: 'Précision', value: stats.totalAttempted ? `${Math.round(stats.accuracy * 100)}\u202f%` : '—' },
     { label: 'Énigmes résolues', value: stats.totalSolved.toLocaleString('fr-FR') },
     { label: 'Meilleure série', value: stats.bestStreak.toString() },
     { label: 'Temps de jeu', value: formatDuration(stats.totalTimeMs) },
@@ -69,7 +69,7 @@ export function StatsScreen({ direction }: { direction: 1 | -1 }) {
                     </div>
                     <ProgressBar thin value={s.bestScore / maxBest} label={`Record ${m.name}`} />
                     <span className="mode-bar__meta">
-                      {s.games} partie{s.games > 1 ? 's' : ''} · précision {s.totalAttempted ? `${Math.round(s.accuracy * 100)} %` : '—'}
+                      {s.games} partie{s.games > 1 ? 's' : ''} · précision {s.totalAttempted ? `${Math.round(s.accuracy * 100)}\u202f%` : '—'}
                     </span>
                   </li>
                 );

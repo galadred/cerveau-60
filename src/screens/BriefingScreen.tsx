@@ -6,7 +6,14 @@ import { DIFFICULTIES, ROUND_DURATION_MS, getDifficulty, getMode } from '@/core/
 import { BASE_POINTS, MAX_COMBO, MAX_SPEED_BONUS, comboMultiplier } from '@/core/scoring';
 import type { DifficultyId, ModeId } from '@/core/types';
 import { useGameStore } from '@/state/GameStore';
+import { createId } from '@/core/id';
+import { Button } from '@/ui/Button';
+import { IconPlay } from '@/ui/Icons';
 import { IconCheck, IconClock, IconFlame, IconLock } from '@/ui/Icons';
+
+/** Modes dont le moteur d'énigmes est disponible. */
+const PLAYABLE: Partial<Record<ModeId, true>> = { logic: true };
+const NEXT_STEP: Partial<Record<ModeId, string>> = { observation: 'Étape 3', riddles: 'Étape 4', daily: 'Étape 5' };
 import { ModeGlyph } from '@/ui/ModeGlyph';
 import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Screen, stagger } from './Screen';
@@ -23,6 +30,7 @@ export function BriefingScreen({ direction, mode }: { direction: 1 | -1; mode: M
   const [difficulty, setDifficulty] = useState<DifficultyId>(isDaily ? DAILY_DIFFICULTY : 'novice');
   const diff = getDifficulty(difficulty);
   const ms = stats.byMode[mode];
+  const launch = () => navigate({ name: 'play', mode, difficulty, run: createId() });
 
   return (
     <Screen direction={direction}>
@@ -114,17 +122,31 @@ export function BriefingScreen({ direction, mode }: { direction: 1 | -1; mode: M
           <p className="num briefing__record">{ms.bestScore.toLocaleString('fr-FR')}</p>
           <dl className="briefing__kv">
             <div><dt>Parties</dt><dd className="num">{ms.games}</dd></div>
-            <div><dt>Précision</dt><dd className="num">{ms.games ? `${Math.round(ms.accuracy * 100)} %` : '—'}</dd></div>
+            <div><dt>Précision</dt><dd className="num">{ms.games ? `${Math.round(ms.accuracy * 100)}\u202f%` : '—'}</dd></div>
           </dl>
-          <div className="build-notice" role="note">
-            <span className="tag tag--neutral">Étape 2</span>
-            <p>Le moteur de manche et les énigmes {isDaily ? 'du défi quotidien' : `du mode ${def.name}`} sont la prochaine étape de développement.</p>
-          </div>
+          {PLAYABLE[mode] ? (
+            <Button className="launch--desktop" size="lg" block icon={<IconPlay />} onClick={launch}>
+              Lancer la manche
+            </Button>
+          ) : (
+            <div className="build-notice" role="note">
+              <span className="tag tag--neutral">{NEXT_STEP[mode]}</span>
+              <p>Les énigmes {isDaily ? 'du défi quotidien' : `du mode ${def.name}`} arrivent à la prochaine étape de développement. Le mode Logique est jouable dès maintenant.</p>
+            </div>
+          )}
           <button className="link-btn" onClick={() => navigate({ name: 'leaderboard', mode })}>
             Voir le classement {def.name} →
           </button>
         </motion.aside>
       </motion.div>
+
+      {PLAYABLE[mode] && (
+        <div className="launch-bar">
+          <Button size="lg" block icon={<IconPlay />} onClick={launch}>
+            Lancer · {diff.name}
+          </Button>
+        </div>
+      )}
     </Screen>
   );
 }
