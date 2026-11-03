@@ -1,0 +1,40 @@
+:root {
+  /* Palette */
+  --c-black: #101114;
+  --c-anthracite: #292b32;
+  --c-red: #c83232;
+  --c-ivory: #e8e4da;
+
+  /* Dérivées */
+  --c-black-2: #16171b;
+  --c-black-3: #1d1e23;
+  --c-line: rgba(232, 228, 218, 0.09);
+  --c-line-strong: rgba(232, 228, 218, 0.18);
+  --c-ivory-70: rgba(232, 228, 218, 0.7);
+  --c-ivory-50: rgba(232, 228, 218, 0.5);
+  --c-ivory-30: rgba(232, 228, 218, 0.3);
+  --c-red-hot: #e04444;
+  --c-red-deep: #8f1f22;
+  --c-red-glow: rgba(200, 50, 50, 0.35);
+  --c-red-faint: rgba(200, 50, 50, 0.12);
+
+  /* Typographie */
+  --f-display: 'Instrument Serif', 'Times New Roman', serif;
+  --f-ui: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Rayons, ombres, mouvements */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --shadow-card: 0 1px 0 rgba(232, 228, 218, 0.04) inset, 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Mise en page */
+  --gutter: clamp(16px, 4vw, 40px);
+  --maxw: 1160px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
