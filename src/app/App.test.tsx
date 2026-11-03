@@ -108,11 +108,29 @@ describe('Application', () => {
     expect(localStorage.getItem('cerveau60:results')).toBeNull();
   });
 
-  it('les modes non encore développés n’ont pas de bouton de lancement', async () => {
+  it('lance une manche Observation et répond en touchant une case', async () => {
     await onboard();
     fireEvent.click(screen.getByRole('button', { name: /^jouer$/i }));
     fireEvent.click(await screen.findByRole('button', { name: /observation/i }));
-    expect(await screen.findByText(/étape 3/i)).toBeInTheDocument();
+    fireEvent.click((await screen.findAllByRole('button', { name: /lancer/i }))[0]);
+    expect(await screen.findByRole('timer', {}, { timeout: 4000 })).toBeInTheDocument();
+    await screen.findByText(/intrus|différence|motif|détail caché/i, { selector: '.tag' }, { timeout: 4000 });
+    const cells = screen.queryAllByRole('button', { name: /ligne \d, colonne \d/i });
+    const options = screen.queryAllByRole('button', { name: /^réponse \d/i });
+    expect(cells.length + options.length).toBeGreaterThan(0);
+    fireEvent.click(cells[0] ?? options[0]);
+    // verrou pendant le retour visuel
+    expect((cells[1] ?? options[1])).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /abandonner la manche/i }));
+    await act(async () => fireEvent.click(await screen.findByRole('button', { name: /^abandonner$/i })));
+    expect(localStorage.getItem('cerveau60:results')).toBeNull();
+  });
+
+  it('les modes non encore développés n’ont pas de bouton de lancement', async () => {
+    await onboard();
+    fireEvent.click(screen.getByRole('button', { name: /^jouer$/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /énigmes/i }));
+    expect(await screen.findByText(/étape 4/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /lancer/i })).toBeNull();
   });
 });

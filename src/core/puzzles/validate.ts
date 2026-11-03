@@ -3,6 +3,7 @@ import { solveSymbols } from './deduction';
 import { isUniqueSequence } from './solvers';
 import { CHOICE_COUNT } from './choices';
 import type { Puzzle } from './types';
+import { validateObservation } from '../observation/validate';
 
 /**
  * Contrôle indépendant d'une énigme, à partir de ce qui est affiché :
@@ -10,6 +11,7 @@ import type { Puzzle } from './types';
  * qui est bien celle marquée comme réponse.
  */
 export function validatePuzzle(p: Puzzle): { ok: true } | { ok: false; reason: string } {
+  if (p.display.type === 'grid' || p.display.type === 'compare' || p.display.type === 'count') return validateObservation(p);
   if (p.choices.length !== CHOICE_COUNT) return { ok: false, reason: 'nombre de propositions' };
   if (new Set(p.choices).size !== CHOICE_COUNT) return { ok: false, reason: 'propositions en double' };
   if (!p.choices.every(Number.isInteger)) return { ok: false, reason: 'proposition non entière' };

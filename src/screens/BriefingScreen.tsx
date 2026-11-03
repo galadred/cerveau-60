@@ -12,8 +12,8 @@ import { IconPlay } from '@/ui/Icons';
 import { IconCheck, IconClock, IconFlame, IconLock } from '@/ui/Icons';
 
 /** Modes dont le moteur d'énigmes est disponible. */
-const PLAYABLE: Partial<Record<ModeId, true>> = { logic: true };
-const NEXT_STEP: Partial<Record<ModeId, string>> = { observation: 'Étape 3', riddles: 'Étape 4', daily: 'Étape 5' };
+const PLAYABLE: Partial<Record<ModeId, true>> = { logic: true, observation: true };
+const NEXT_STEP: Partial<Record<ModeId, string>> = { riddles: 'Étape 4', daily: 'Étape 5' };
 import { ModeGlyph } from '@/ui/ModeGlyph';
 import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Screen, stagger } from './Screen';
@@ -131,7 +131,7 @@ export function BriefingScreen({ direction, mode }: { direction: 1 | -1; mode: M
           ) : (
             <div className="build-notice" role="note">
               <span className="tag tag--neutral">{NEXT_STEP[mode]}</span>
-              <p>Les énigmes {isDaily ? 'du défi quotidien' : `du mode ${def.name}`} arrivent à la prochaine étape de développement. Le mode Logique est jouable dès maintenant.</p>
+              <p>Les énigmes {isDaily ? 'du défi quotidien' : `du mode ${def.name}`} arrivent à la prochaine étape de développement. Les modes Logique et Observation sont jouables dès maintenant.</p>
             </div>
           )}
           <button className="link-btn" onClick={() => navigate({ name: 'leaderboard', mode })}>

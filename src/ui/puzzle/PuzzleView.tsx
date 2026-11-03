@@ -1,5 +1,6 @@
 import { fmt, type Puzzle, type SymToken } from '@/core/puzzles/types';
 import { Shape, shapeLabel } from './Shape';
+import { ObservationView, type CellMarks } from '../observation/ObservationView';
 
 function Tokens({ tokens, size }: { tokens: SymToken[]; size: number }) {
   return (
@@ -16,9 +17,20 @@ function spoken(tokens: SymToken[]): string {
 }
 
 /** Rendu d'une énigme du mode Logique. `compact` sert à la revue des résultats. */
-export function PuzzleView({ puzzle, compact = false }: { puzzle: Puzzle; compact?: boolean }) {
+export function PuzzleView({ puzzle, compact = false, onPick, marks }: {
+  puzzle: Puzzle;
+  compact?: boolean;
+  /** Énigmes à grille : sélection d'une case. */
+  onPick?: (index: number) => void;
+  /** Énigmes à grille : cases à mettre en évidence. */
+  marks?: CellMarks | null;
+}) {
   const d = puzzle.display;
   switch (d.type) {
+    case 'grid':
+    case 'compare':
+    case 'count':
+      return <ObservationView puzzle={puzzle} onPick={onPick} marks={marks} compact={compact} />;
     case 'sequence': {
       const longest = Math.max(...d.terms.map((t) => fmt(t).length));
       const dense = d.terms.length + 1 >= 7 || longest >= 4;
@@ -67,4 +79,8 @@ export const KIND_LABEL: Record<Puzzle['kind'], string> = {
   sequence: 'Suite logique',
   arithmetic: 'Calcul',
   deduction: 'Déduction',
+  odd: 'Intrus',
+  difference: 'Différence',
+  pattern: 'Erreur de motif',
+  count: 'Détail caché',
 };

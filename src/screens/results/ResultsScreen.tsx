@@ -2,7 +2,8 @@ import { motion } from 'motion/react';
 import { useNavigation } from '@/app/navigation';
 import { DIFFICULTIES, getDifficulty, getMode } from '@/core/modes';
 import { levelFromXp } from '@/core/progression';
-import { fmt } from '@/core/puzzles/types';
+import { fmt, type Puzzle } from '@/core/puzzles/types';
+import { position } from '@/core/observation/cells';
 import { createId } from '@/core/id';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useGameStore } from '@/state/GameStore';
@@ -102,11 +103,11 @@ export function ResultsScreen({ direction, report }: { direction: 1 | -1; report
                         {status === 'ok' ? `+${r.points}` : `−${(r.penaltyMs / 1000).toLocaleString('fr-FR')}\u202fs`}
                       </span>
                     </div>
-                    <PuzzleView puzzle={p} compact />
+                    <PuzzleView puzzle={p} compact marks={p.input === 'grid' ? { answerIndex: p.answerIndex, choice: r.choice } : null} />
                     <p className="review__answer">
-                      {status === 'skip' ? 'Passée.' : <>Ta réponse : <strong className="num">{fmt(p.choices[r.choice!])}</strong>. </>}
-                      {status !== 'ok' && <>Bonne réponse : <strong className="num accent">{fmt(p.choices[p.answerIndex])}</strong>.</>}
-                      <span className="review__time num"> {(r.answerTimeMs / 1000).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}\u202fs</span>
+                      {status === 'skip' ? 'Passée. ' : <>Ta réponse : <strong className="num">{answerText(p, r.choice!)}</strong>. </>}
+                      {status !== 'ok' && <>Bonne réponse : <strong className="num accent">{answerText(p, p.answerIndex)}</strong>.</>}
+                      <span className="review__time num"> {(r.answerTimeMs / 1000).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}{'\u202f'}s</span>
                     </p>
                     <p className="review__why">{p.explanation}</p>
                   </li>
@@ -118,4 +119,14 @@ export function ResultsScreen({ direction, report }: { direction: 1 | -1; report
       </motion.div>
     </Screen>
   );
+}
+
+/** Libellé d'une réponse : valeur numérique, ou position de la case touchée. */
+function answerText(p: Puzzle, index: number): string {
+  if (p.input === 'grid') {
+    const d = p.display;
+    const cols = d.type === 'grid' || d.type === 'compare' ? d.cols : 1;
+    return position(index, cols);
+  }
+  return fmt(p.choices[index]);
 }

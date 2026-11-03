@@ -101,7 +101,7 @@ export function describeTokens(tokens: readonly SymToken[]): string {
   return tokens.map((k) => (k.t === 'sym' ? SYMBOL_GLYPH[k.s] : k.t === 'num' ? fmt(k.v) : k.v)).join(' ');
 }
 
-export function generateDeduction(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity'> | null {
+export function generateDeduction(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity' | 'input'> | null {
   const shape = rng.pick(SHAPES[intensity]);
   const order = rng.shuffle(SYMBOLS).slice(0, shape.symbols);
   const maxVal = intensity <= 2 ? 12 : 9;

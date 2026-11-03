@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@/app/navigation';
 import { RoundSession, type AnswerOutcome } from '@/core/engine/session';
 import { proofFromLog, verifyRound } from '@/core/engine/verify';
+import { sourceFor } from '@/core/engine/sources';
 import { ROUND_DURATION_MS, getDifficulty, getMode } from '@/core/modes';
 import { GENERATOR_VERSION } from '@/core/puzzles/logic';
 import { fmt } from '@/core/puzzles/types';
@@ -28,7 +29,7 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
   const storeRef = useRef(store);
   storeRef.current = store;
   const sessionRef = useRef<RoundSession>();
-  if (!sessionRef.current) sessionRef.current = new RoundSession({ seed: randomSeed(), difficulty });
+  if (!sessionRef.current) sessionRef.current = new RoundSession({ seed: randomSeed(), difficulty, source: sourceFor(mode) });
   const session = sessionRef.current;
 
   const [stage, setStage] = useState<Stage>('intro');
@@ -67,7 +68,7 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
     setStage('ending');
     const sum = session.summary();
     const proof = proofFromLog(sum.seed, sum.log, GENERATOR_VERSION);
-    const check = verifyRound(sum, proof);
+    const check = verifyRound(sum, proof, sourceFor(mode));
     await new Promise((r) => setTimeout(r, 1100)); // « Temps écoulé »
     if (!check.ok) {
       setStage('error');
@@ -150,12 +151,13 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
       if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
       const n = ['1', '2', '3', '4'].indexOf(e.key);
       const l = ['a', 'b', 'c', 'd'].indexOf(e.key.toLowerCase());
-      if (n >= 0 || l >= 0) choose(n >= 0 ? n : l);
+      const byKeys = session.current?.input === 'choice';
+      if (byKeys && (n >= 0 || l >= 0)) choose(n >= 0 ? n : l);
       else if (e.key.toLowerCase() === 'p') skip();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [stage, quitOpen, choose, skip]);
+  }, [stage, quitOpen, choose, skip, session]);
 
   const diff = getDifficulty(difficulty);
   const alert = stage === 'playing' && remaining <= ALERT_MS;
@@ -245,7 +247,13 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
                 </span>
               </div>
               <h2 className="puzzle-card__prompt">{puzzle.prompt}</h2>
-              <div className="puzzle-card__body"><PuzzleView puzzle={puzzle} /></div>
+              <div className="puzzle-card__body">
+                <PuzzleView
+                  puzzle={puzzle}
+                  onPick={puzzle.input === 'grid' ? choose : undefined}
+                  marks={feedback && puzzle.input === 'grid' ? { answerIndex: feedback.answerIndex, choice: feedback.choice } : null}
+                />
+              </div>
             </motion.section>
           )}
 
@@ -263,8 +271,8 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
         </AnimatePresence>
       </div>
 
-      {stage === 'playing' && puzzle && (
-        <div className="choices" role="group" aria-label="Propositions">
+      {stage === 'playing' && puzzle && puzzle.input === 'choice' && (
+        <div className={`choices${puzzle.display.type === 'count' ? ' choices--row' : ''}`} role="group" aria-label="Propositions">
           {puzzle.choices.map((c, i) => {
             const state = feedback
               ? i === feedback.answerIndex ? 'right' : i === feedback.choice ? 'wrong' : 'idle'
@@ -290,7 +298,9 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
           <button className="link-btn" onClick={skip} disabled={!!feedback}>
             Passer · −{(diff.penaltyMs / 2000).toLocaleString('fr-FR')} s
           </button>
-          <span className="game__keys">Clavier : 1–4 pour répondre · P pour passer</span>
+          <span className="game__keys">
+            {puzzle?.input === 'grid' ? 'Touche ou clique une case · P pour passer' : 'Clavier : 1–4 pour répondre · P pour passer'}
+          </span>
         </div>
       )}
 

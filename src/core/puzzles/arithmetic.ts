@@ -189,7 +189,7 @@ export function checkArithmetic(tok: readonly string[], choices: readonly number
   return satisfying.length === 1 && satisfying[0] === choices[answerIndex];
 }
 
-export function generateArithmetic(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity'> | null {
+export function generateArithmetic(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity' | 'input'> | null {
   const d = rng.pick(TEMPLATES[intensity])(rng);
   if (!d || !Number.isInteger(d.answer) || Math.abs(d.answer) > 9999) return null;
   const { choices, answerIndex } = buildChoices(rng, d.answer, d.traps);

@@ -73,12 +73,12 @@ describe('Calculs', () => {
   });
 });
 
-function sweep(gen: (rng: Rng, i: Intensity) => Omit<Puzzle, 'id' | 'intensity'> | null, n: number) {
+function sweep(gen: (rng: Rng, i: Intensity) => Omit<Puzzle, 'id' | 'intensity' | 'input'> | null, n: number) {
   for (const i of INTENSITIES) {
     for (let s = 0; s < n; s++) {
       const d = gen(new Rng(`sweep-${i}-${s}`), i);
       if (!d) continue;
-      const p: Puzzle = { ...d, id: 'x', intensity: i };
+      const p: Puzzle = { ...d, input: 'choice', id: 'x', intensity: i };
       const v = validatePuzzle(p);
       if (!v.ok) throw new Error(`I${i} #${s} ${v.reason} ${JSON.stringify(p)}`);
     }

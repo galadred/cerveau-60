@@ -9,6 +9,7 @@ import './styles/base.css';
 import './styles/ui.css';
 import './styles/screens.css';
 import './styles/game.css';
+import './styles/observation.css';
 import { App } from './app/App';
 
 createRoot(document.getElementById('root')!).render(

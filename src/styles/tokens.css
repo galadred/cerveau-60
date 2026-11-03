@@ -17,6 +17,8 @@
   --c-red-deep: #8f1f22;
   --c-red-glow: rgba(200, 50, 50, 0.35);
   --c-red-faint: rgba(200, 50, 50, 0.12);
+  /* Gris des formes d’observation : lisible sur fond sombre, distinct de l’ivoire */
+  --c-obs-grey: #85878f;
 
   /* Typographie */
   --f-display: 'Instrument Serif', 'Times New Roman', serif;

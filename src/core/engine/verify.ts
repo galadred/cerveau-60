@@ -43,12 +43,14 @@ export function verifyRound(
 
   for (let i = 0; i < proof.a.length; i++) {
     const [c, t] = proof.a[i];
-    if (!Number.isInteger(c) || c < -1 || c > 3 || !Number.isFinite(t) || t < 0) return { ok: false, reason: `réponse ${i} invalide` };
     const intensity = intensityFor(rank, solved);
     let salt = 0;
     let p = source(proof.seed, i, intensity, salt);
     while (seen.has(p.id) && salt < 20) p = source(proof.seed, i, intensity, ++salt);
     seen.add(p.id);
+    if (!Number.isInteger(c) || c < -1 || c >= p.choices.length || !Number.isFinite(t) || t < 0) {
+      return { ok: false, reason: `réponse ${i} invalide` };
+    }
 
     used += t;
     if (c === -1) {

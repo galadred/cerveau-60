@@ -163,3 +163,47 @@
 .syms--compact .sym-op { font-size: 18px; }
 .syms--compact .syms__line--ask { padding-top: 6px; }
 .syms--compact .expr__ask { font-size: 15px; }
+
+/* ---------- Écrans courts (téléphones) : tout doit tenir sans défiler ---------- */
+@media (max-height: 820px) {
+  .game { gap: 10px; }
+  .puzzle-card { padding: 14px 16px; gap: 10px; }
+  .puzzle-card__prompt { font-size: 14px; }
+  .puzzle-card__body { padding: 4px 0 2px; }
+  .syms { gap: 6px; }
+  .syms__line { font-size: 21px; min-height: 30px; gap: 7px; }
+  .syms__line--ask { padding-top: 8px; }
+  .syms .shape { width: 24px; height: 24px; }
+  .sym-op { font-size: 22px; }
+  .syms .expr__ask { font-size: 20px; }
+  .choice { min-height: 58px; }
+}
+
+@media (max-height: 820px) {
+  .game__stage { min-height: 0; }
+}
+@media (max-height: 700px) {
+  .game.container { padding-top: calc(var(--safe-top) + 8px); padding-bottom: calc(var(--safe-bottom) + 8px); }
+  .game { gap: 8px; }
+  .hud .timer-ring { transform: scale(0.78); margin: -9px; }
+  .hud__score-value { font-size: 24px; }
+  .hud .icon-btn { width: 38px; height: 38px; }
+  .puzzle-card { padding: 12px 14px; gap: 8px; border-radius: 18px; }
+  .puzzle-card__prompt { font-size: 13px; line-height: 1.35; }
+  .seq__tile { height: 50px; }
+  .expr { font-size: 30px; }
+  .syms__line { font-size: 18px; min-height: 26px; gap: 6px; }
+  .syms .shape { width: 20px; height: 20px; }
+  .sym-op { font-size: 19px; }
+  .syms__line--ask { padding-top: 6px; }
+  .choices { gap: 8px; }
+  .choice { min-height: 50px; }
+  .choice__value { font-size: 22px; }
+  .choices--row .choice { min-height: 48px; }
+  .obs-grid { --chrome: 300px; }
+  .obs-count .obs-grid { --chrome: 380px; }
+  .obs-compare .obs-grid { --chrome: 310px; }
+  .obs-target { padding: 3px 6px 3px 12px; }
+  .obs-target__glyph { width: 24px; height: 24px; }
+  .game__foot .link-btn { padding: 4px 0; }
+}

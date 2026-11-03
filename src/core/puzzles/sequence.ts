@@ -139,7 +139,7 @@ const FAMILIES: Record<Intensity, Family[]> = {
 const MAX_ABS = 5000;
 
 /** Génère une suite dont la réponse est unique parmi les règles usuelles ; null si échec. */
-export function generateSequence(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity'> | null {
+export function generateSequence(rng: Rng, intensity: Intensity): Omit<Puzzle, 'id' | 'intensity' | 'input'> | null {
   const d = rng.pick(FAMILIES[intensity])(rng);
   if ([...d.terms, d.answer].some((x) => Math.abs(x) > MAX_ABS)) return null;
   if (!isUniqueSequence(d.terms, d.answer)) return null;

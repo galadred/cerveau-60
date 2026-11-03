@@ -33,7 +33,13 @@ src/
 │   │   ├── expr.ts       Évaluateur indépendant de ce qui est affiché
 │   │   ├── validate.ts   Contrôle final de chaque énigme
 │   │   └── logic.ts      Orchestration déterministe (graine, rang, intensité)
+│   ├── observation/      Mode Observation
+│   │   ├── cells.ts      Formes, symétries de rotation, signature visuelle, vocabulaire
+│   │   ├── generators.ts Intrus, différences, erreurs de motif, détails cachés
+│   │   ├── validate.ts   Preuves d'unicité (comparaison visuelle, recherche de périodes, comptage)
+│   │   └── index.ts      Orchestration déterministe
 │   └── engine/
+│       ├── sources.ts    Générateur d'énigmes de chaque mode jouable
 │       ├── session.ts    Moteur de manche (horloge, réponses, score, pénalités)
 │       ├── intensity.ts  Difficulté progressive pendant la manche
 │       └── verify.ts     Rejeu intégral d'une manche à partir de sa preuve
@@ -63,6 +69,24 @@ depuis `services/index.ts` quand `VITE_SUPABASE_URL` est défini. L'id du profil
     toutes les règles qui s'ajustent donnent la même réponse. Exemple rejeté : 1, 3, 6, 11, 19 (31 ou 32).
   - Calculs : réévalués par un analyseur indépendant ; exactement une proposition satisfait l'égalité.
   - Déductions : recherche exhaustive sur tout le domaine annoncé au joueur (entiers de 1 à 20).
+
+## Garanties du mode Observation
+
+- **Comparaison visuelle, jamais paramétrique** : chaque forme a sa symétrie (carré 90°, croix 90°,
+  triangle 120°, rond invariant). Un carré tourné de 90° est donc reconnu comme identique — aucune
+  « différence invisible » ne peut être proposée.
+- **Intrus** : une seule case diffère, toutes les autres sont identiques.
+- **Différence** : comparaison case à case des deux images ; exactement un écart.
+- **Erreur de motif** : toutes les périodes possibles (colonnes × lignes) sont testées ; une seule case
+  doit pouvoir être l'erreur, et chaque élément du motif doit être observé au moins deux fois.
+- **Détail caché** : comptage exact ; une seule des 4 propositions est juste.
+- **Progression** : grilles de 3 × 3 à 6 × 5 ; écarts de couleur/forme (intensité 1) jusqu'aux rotations
+  de 15°, points discrets et changements de taille (intensité 5).
+- **Mobile** : la taille des grilles s'adapte à la hauteur d'écran ; une manche ne demande jamais de défiler
+  (vérifié sur iPhone 13 et iPhone SE).
+
+## Garanties communes
+
 - **Difficulté progressive** : 5 intensités ; la manche démarre au rang de la difficulté et monte d'un
   cran toutes les 4 bonnes réponses (+2 au maximum).
 - **Chronomètre** : horloge monotone (`performance.now`) à échéance absolue — changer l'heure du système,
@@ -80,7 +104,7 @@ depuis `services/index.ts` quand `VITE_SUPABASE_URL` est défini. L'id du profil
 |---|---|---|
 | 1 | Fondations, design system, stockage, profil, menu, navigation animée, modes, briefing & difficultés, stats, classement local, réglages | ✅ |
 | 2 | Moteur de manche (60 s, pénalités, série, score, écran de résultats) + mode **Logique** (générateurs procéduraux) | ✅ |
-| 3 | Mode **Observation** (différences, intrus, détails cachés) | ⏳ |
-| 4 | Mode **Énigmes** (banque d'énigmes, vérification tolérante des réponses) | |
+| 3 | Mode **Observation** (intrus, différences, erreurs de motif, détails cachés) | ✅ |
+| 4 | Mode **Énigmes** (banque d'énigmes, vérification tolérante des réponses) | ⏳ |
 | 5 | **Défi quotidien** (énigme déterministe du jour, une tentative) | |
 | 6 | Finitions : sons, succès, PWA hors ligne, puis Supabase | |
