@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GameResult, PlayerProfile } from '@/core/types';
 import { LocalStorageStore } from './storage/KeyValueStore';
-import { MAX_RESULTS, createLocalRepositories } from './repositories/local';
+import { MAX_PROOFS, MAX_RESULTS, compactHistory, createLocalRepositories } from './repositories/local';
 
 const profile: PlayerProfile = { id: 'p1', name: 'Ada', createdAt: '2026-01-01', xp: 0, settings: { reducedMotion: false } };
 const res = (p: Partial<GameResult>): GameResult => ({
@@ -50,9 +50,15 @@ describe('Dépôts locaux', () => {
     await repos.results.clear('p1');
     expect(await repos.results.list('p1')).toHaveLength(0);
     expect(await repos.results.list('other')).toHaveLength(1);
-    for (let i = 0; i < MAX_RESULTS + 10; i++) await repos.results.add(res({ score: i }));
-    const all = JSON.parse(localStorage.getItem('cerveau60:results')!);
-    expect(all).toHaveLength(MAX_RESULTS);
+    const many = Array.from({ length: MAX_RESULTS + 10 }, (_, i) => res({ score: i, proof: { v: 1, seed: 's', a: [[0, 1000]] } }));
+    const compacted = compactHistory(many);
+    expect(compacted).toHaveLength(MAX_RESULTS);
+    expect(compacted[compacted.length - 1].score).toBe(MAX_RESULTS + 9); // les plus récents sont gardés
+    expect(compacted.filter((r) => r.proof)).toHaveLength(MAX_PROOFS);
+    expect(compacted[compacted.length - 1].proof).toBeDefined();
+    expect(compacted[0].proof).toBeUndefined();
+    // taille raisonnable pour localStorage (quota ≈ 5 Mo)
+    expect(JSON.stringify(compacted).length).toBeLessThan(2_500_000);
   });
 
   it('classement trié, filtré, classé', async () => {

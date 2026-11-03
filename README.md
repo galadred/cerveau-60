@@ -9,6 +9,7 @@ npm install
 npm run dev        # développement
 npm test           # tests unitaires + intégration (Vitest)
 npm run build      # typecheck + build de production
+npm run audit:visual  # audit au pixel des énigmes Observation (nécessite Playwright + Chromium)
 ```
 
 ## Architecture
@@ -82,6 +83,12 @@ depuis `services/index.ts` quand `VITE_SUPABASE_URL` est défini. L'id du profil
 - **Détail caché** : comptage exact ; une seule des 4 propositions est juste.
 - **Progression** : grilles de 3 × 3 à 6 × 5 ; écarts de couleur/forme (intensité 1) jusqu'aux rotations
   de 15°, points discrets et changements de taille (intensité 5).
+- **Audit visuel** : `npm run audit:visual` dessine 1 500 énigmes avec le vrai composant, les rastérise
+  dans Chromium et compare les pixels : exactement une case visiblement différente par énigme, 0 pixel
+  d'écart sur toutes les autres. La géométrie des formes (`core/observation/geometry.ts`) est partagée par
+  le rendu et par des tests qui prouvent ses symétries.
+- **Retour visuel sans ambiguïté** : la bonne case est cerclée dans les deux images ; l'erreur n'est
+  marquée (pointillés + ✕) que dans l'image touchée, et l'assombrissement reste identique entre A et B.
 - **Mobile** : la taille des grilles s'adapte à la hauteur d'écran ; une manche ne demande jamais de défiler
   (vérifié sur iPhone 13 et iPhone SE).
 

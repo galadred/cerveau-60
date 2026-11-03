@@ -4,6 +4,7 @@ import { levelFromXp, type LevelInfo } from '@/core/progression';
 import { computeStats } from '@/core/stats';
 import type { GameResult, PlayerProfile, PlayerSettings, PlayerStats } from '@/core/types';
 import { createRepositories } from '@/services';
+import { compactHistory } from '@/services/repositories/local';
 import type { Repositories } from '@/services';
 
 export const NAME_MAX = 18;
@@ -100,7 +101,7 @@ export function GameStoreProvider({ children, repos: injected }: { children: Rea
         playedAt: new Date().toISOString(),
       };
       await repos.results.add(result);
-      setResults((prev) => [...prev, result]);
+      setResults((prev) => compactHistory([...prev, result]));
       await persist({ ...profile, xp: profile.xp + Math.max(0, result.score) });
       return result;
     },

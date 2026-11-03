@@ -6,7 +6,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "audit:visual": "AUDIT_OUT=audit/out.json vitest run audit && node audit/pixel-audit.cjs audit/out.json"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",

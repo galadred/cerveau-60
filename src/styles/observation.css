@@ -12,7 +12,11 @@
   transition: border-color 0.18s, background-color 0.18s, box-shadow 0.25s, transform 0.15s var(--ease-out), opacity 0.25s;
 }
 button.obs-cell { cursor: pointer; }
-button.obs-cell:hover:not(:disabled) { border-color: var(--c-ivory-50); background: rgba(41, 43, 50, 0.7); }
+/* Survol uniquement sur les appareils à pointeur : sur écran tactile, l'état
+   « survol » resterait collé à la dernière case touchée et la ferait paraître différente. */
+@media (hover: hover) {
+  button.obs-cell:hover:not(:disabled) { border-color: var(--c-ivory-50); background: rgba(41, 43, 50, 0.7); }
+}
 button.obs-cell:active:not(:disabled) { transform: scale(0.94); }
 button.obs-cell:disabled { cursor: default; }
 .obs-glyph { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -21,8 +25,17 @@ button.obs-cell:disabled { cursor: default; }
   border-color: var(--c-ivory); background: rgba(232, 228, 218, 0.12);
   box-shadow: 0 0 0 2px var(--c-ivory), 0 0 24px -4px rgba(232, 228, 218, 0.6); z-index: 1;
 }
-.obs-cell--wrong { border-color: var(--c-red); background: rgba(200, 50, 50, 0.28); box-shadow: 0 0 0 2px var(--c-red); }
-.obs-grid:has(.obs-cell--right) .obs-cell:not(.obs-cell--right):not(.obs-cell--wrong) { opacity: 0.45; }
+.obs-cell--wrong { border: 2px dashed var(--c-red); }
+.obs-cell__badge {
+  position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 11px; font-weight: 800; line-height: 1;
+  background: var(--c-ivory); color: var(--c-black); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.obs-cell--wrong .obs-cell__badge { background: var(--c-red); color: var(--c-ivory); }
+.obs-grid--compact .obs-cell__badge { display: none; }
+.obs-grid:has(.obs-cell--right) .obs-cell:not(.obs-cell--right):not(.obs-cell--wrong):not(.obs-cell--echo) { opacity: 0.45; }
+/* même luminosité et même cadre que la case touchée, sans marque d'erreur */
+.obs-cell--echo { border: 2px dashed transparent; }
 
 /* Deux images côte à côte */
 .obs-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
@@ -54,7 +67,7 @@ button.obs-cell:disabled { cursor: default; }
 .obs-grid--compact { gap: 3px; width: min(100%, calc(var(--cols) * 30px)); margin: 0; }
 .obs-grid--compact .obs-cell { border-radius: 5px; padding: 10%; }
 .obs-grid--compact .obs-cell--right { box-shadow: 0 0 0 1.5px var(--c-ivory); }
-.obs-grid--compact .obs-cell--wrong { box-shadow: 0 0 0 1.5px var(--c-red); }
+.obs-grid--compact .obs-cell--wrong { border-width: 1.5px; }
 .obs-compare--compact { width: auto; grid-template-columns: auto auto; justify-content: start; gap: 14px; }
 .obs-compare--compact .obs-grid { width: calc(var(--cols) * 28px); }
 .review .obs-count { justify-items: start; }

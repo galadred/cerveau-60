@@ -21,7 +21,7 @@ export function PuzzleView({ puzzle, compact = false, onPick, marks }: {
   puzzle: Puzzle;
   compact?: boolean;
   /** Énigmes à grille : sélection d'une case. */
-  onPick?: (index: number) => void;
+  onPick?: (index: number, panel?: 0 | 1) => void;
   /** Énigmes à grille : cases à mettre en évidence. */
   marks?: CellMarks | null;
 }) {

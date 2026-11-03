@@ -103,7 +103,9 @@
   background: linear-gradient(180deg, rgba(41, 43, 50, 0.85), rgba(29, 30, 35, 0.85)); border: 1px solid var(--c-line-strong);
   transition: transform 0.15s var(--ease-out), border-color 0.2s, background-color 0.2s, box-shadow 0.25s, opacity 0.25s;
 }
-.choice:hover:not(:disabled) { border-color: var(--c-ivory-50); transform: translateY(-2px); }
+@media (hover: hover) {
+  .choice:hover:not(:disabled) { border-color: var(--c-ivory-50); transform: translateY(-2px); }
+}
 .choice:active:not(:disabled) { transform: scale(0.97); }
 .choice:disabled { cursor: default; }
 .choice__key {

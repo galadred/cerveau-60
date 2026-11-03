@@ -7,8 +7,24 @@ import type {
 
 export const SCHEMA_VERSION = 1;
 const KEYS = { schema: 'schema', profile: 'profile', results: 'results' } as const;
-/** Historique conservé localement (les plus récents). */
-export const MAX_RESULTS = 500;
+/**
+ * Historique conservé localement. Les statistiques étant calculées à partir de
+ * l'historique, la limite doit être assez haute pour ne jamais les fausser en
+ * pratique (5 000 manches ≈ 83 h de jeu, ~1,3 Mo).
+ */
+export const MAX_RESULTS = 5000;
+/** Seules les manches les plus récentes gardent leur preuve de rejeu (la plus volumineuse). */
+export const MAX_PROOFS = 200;
+
+export function compactHistory(results: readonly GameResult[]): GameResult[] {
+  const kept = results.slice(-MAX_RESULTS);
+  const cut = kept.length - MAX_PROOFS;
+  return kept.map((r, i) => {
+    if (i >= cut || !r.proof) return r;
+    const { proof: _proof, ...rest } = r;
+    return rest;
+  });
+}
 
 function isProfile(v: unknown): v is PlayerProfile {
   const p = v as PlayerProfile;
@@ -53,7 +69,7 @@ class LocalResultRepository implements ResultRepository {
     return this.all().filter((r) => r.playerId === playerId);
   }
   async add(result: GameResult) {
-    const next = [...this.all(), result].slice(-MAX_RESULTS);
+    const next = compactHistory([...this.all(), result]);
     this.store.set(KEYS.results, next);
   }
   async clear(playerId: string) {

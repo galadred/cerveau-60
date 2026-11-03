@@ -39,6 +39,8 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
   /** Rang de l'énigme affichée (stable pendant le retour visuel). */
   const [puzzleNo, setPuzzleNo] = useState(1);
   const [feedback, setFeedback] = useState<AnswerOutcome | null>(null);
+  /** Double image : panneau touché, pour n'y marquer que l'erreur du joueur. */
+  const [pickedPanel, setPickedPanel] = useState<0 | 1 | undefined>(undefined);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [floater, setFloater] = useState<{ id: number; text: string; bad: boolean } | null>(null);
@@ -250,8 +252,8 @@ export function GameScreen({ mode, difficulty }: { mode: ModeId; difficulty: Dif
               <div className="puzzle-card__body">
                 <PuzzleView
                   puzzle={puzzle}
-                  onPick={puzzle.input === 'grid' ? choose : undefined}
-                  marks={feedback && puzzle.input === 'grid' ? { answerIndex: feedback.answerIndex, choice: feedback.choice } : null}
+                  onPick={puzzle.input === 'grid' ? (i, panel) => { setPickedPanel(panel); choose(i); } : undefined}
+                  marks={feedback && puzzle.input === 'grid' ? { answerIndex: feedback.answerIndex, choice: feedback.choice, panel: pickedPanel } : null}
                 />
               </div>
             </motion.section>
